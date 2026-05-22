@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>envschema</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --border: #2e2e2e;
+            --text: #e0e0e0;
+            --muted: #666;
+            --accent: #00ff88;
+            --danger: #ff4444;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 2rem;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .field-table thead th {
+            text-align: left;
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .field-table tbody tr:hover {
+            background: var(--surface);
+        }
+
+        .field-table tbody td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .field-key {
+            color: var(--accent);
+        }
+
+        select, input[type="text"], input[type="number"] {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        select:focus, input:focus {
+            outline: 1px solid var(--accent);
+            border-color: var(--accent);
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 0.5rem 1.25rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        #result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            background: var(--surface);
+            font-size: 0.85rem;
+            color: var(--muted);
+            min-height: 3rem;
+        }
+
+        #result.success { border-color: var(--accent); color: var(--accent); }
+        #result.error   { border-color: var(--danger); color: var(--danger); }
+
+        .htmx-indicator {
+            display: none;
+            color: var(--muted);
+        }
+        .htmx-request .htmx-indicator { display: inline; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>envschema</h1>
+    <p>Review inferred types below, adjust as needed, then generate your AppConfig schema.</p>
+</header>
+
+<form
+    hx-post="/generate"
+    hx-target="#result"
+    hx-swap="innerHTML"
+    hx-indicator="#spinner"
+>
+    <table class="field-table">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Inferred Type</th>
+                <th>Override Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Fields}}
+            <tr>
+                <td class="field-key">{{.Key}}</td>
+                <td>{{.InferredType}}</td>
+                <td>
+                    <input type="hidden" name="key" value="{{.Key}}">
+                    <select name="type_{{.Key}}">
+                        <option value="string"  {{if eq .InferredType "string"}}selected{{end}}>string</option>
+                        <option value="integer" {{if eq .InferredType "integer"}}selected{{end}}>integer</option>
+                        <option value="number"  {{if eq .InferredType "number"}}selected{{end}}>number</option>
+                        <option value="boolean" {{if eq .InferredType "boolean"}}selected{{end}}>boolean</option>
+                    </select>
+                </td>
+                <td style="text-align:center;">
+                    <input type="checkbox" name="required_{{.Key}}" value="true">
+                </td>
+                <td>
+                    <input type="text" name="desc_{{.Key}}" placeholder="optional description">
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <button type="submit">Generate Schema</button>
+        <span id="spinner" class="htmx-indicator">generating...</span>
+    </div>
+</form>
+
+<div id="result"></div>
+
+</body>
+</html>
