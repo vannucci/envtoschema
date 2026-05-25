@@ -1,6 +1,12 @@
 package main
 
+import "fmt"
+
 func main() {
+
+	argsWithoutProg := os.args[1:]
+
+	fmt.Println(argsWithoutProg)
 	// Workflow 1
 	// read config file
 	// check size

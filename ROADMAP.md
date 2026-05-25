@@ -16,13 +16,13 @@ The validation logic itself isn't the interesting part. The AppConfig integratio
 
 These tools each solve part of the problem. None solve all of it.
 
-| Tool | What it does | What it doesn't do |
-|---|---|---|
-| [AJV](https://ajv.js.org/) (JS/Node) | Validates JSON against a JSON Schema | Knows nothing about AppConfig, doesn't generate schemas |
-| [jsonschema](https://python-jsonschema.readthedocs.io/) (Python) | Same as AJV, Python ecosystem | Same limitations |
-| [gojsonschema](https://github.com/xeipuuv/gojsonschema) / [santhosh-tekuri/jsonschema](https://github.com/santhosh-tekuri/jsonschema) (Go) | Validates JSON against a schema in Go | Schema generation, AppConfig integration: none |
-| [check-jsonschema](https://check-jsonschema.readthedocs.io/) (CLI) | Drop-in CI validator, pip installable | No generation, no AppConfig awareness |
-| AWS Console | Edit AppConfig schemas manually | Exactly the problem we're solving |
+| Tool                                                                                                                                       | What it does                          | What it doesn't do                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- | ------------------------------------------------------- |
+| [AJV](https://ajv.js.org/) (JS/Node)                                                                                                       | Validates JSON against a JSON Schema  | Knows nothing about AppConfig, doesn't generate schemas |
+| [jsonschema](https://python-jsonschema.readthedocs.io/) (Python)                                                                           | Same as AJV, Python ecosystem         | Same limitations                                        |
+| [gojsonschema](https://github.com/xeipuuv/gojsonschema) / [santhosh-tekuri/jsonschema](https://github.com/santhosh-tekuri/jsonschema) (Go) | Validates JSON against a schema in Go | Schema generation, AppConfig integration: none          |
+| [check-jsonschema](https://check-jsonschema.readthedocs.io/) (CLI)                                                                         | Drop-in CI validator, pip installable | No generation, no AppConfig awareness                   |
+| AWS Console                                                                                                                                | Edit AppConfig schemas manually       | Exactly the problem we're solving                       |
 
 The pattern is the same across all of them: **bring your own schema, bring your own config, get a pass/fail**. You still have to write the schema by hand, you still have to know to pull the remote version before validating, and none of them will tell you that someone changed the schema in the AWS console last week.
 
@@ -33,7 +33,7 @@ The pattern is the same across all of them: **bring your own schema, bring your 
 ## V0 — Core Tool
 
 - [x] CLI reads a flat JSON config file
-- [ ] Type inference for `string`, `integer`, `number`, `boolean`
+- [ ] Type inference for `string`, `integer`, `float`, `boolean`
 - [ ] Localhost form UI to review and override inferred types
 - [ ] Mark fields as required, add descriptions
 - [ ] Generate a valid AppConfig JSON Schema file on disk
