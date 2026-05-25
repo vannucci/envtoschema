@@ -1,10 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
 
-	argsWithoutProg := os.args[1:]
+	argsWithoutProg := os.Args[1:]
 
 	fmt.Println(argsWithoutProg)
 	// Workflow 1
