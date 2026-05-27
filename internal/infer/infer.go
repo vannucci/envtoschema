@@ -127,3 +127,31 @@ func InferType(value string) TypeCandidate {
 		Options: []Type{TypeString},
 	}
 }
+
+type InferredElement struct {
+	Key       string
+	Candidate TypeCandidate
+}
+
+func Infer(entries []Entry) []InferredElement {
+	results := make([]InferredElement, 0, len(entries))
+	for _, e := range entries {
+		results = append(results, InferredElement{
+			Key:       e.Key,
+			Candidate: InferType(e.Value),
+		})
+	}
+	return results
+}
+func TypeToString(t Type) string {
+	switch t {
+	case TypeInt:
+		return "integer"
+	case TypeFloat:
+		return "number"
+	case TypeBool:
+		return "boolean"
+	default:
+		return "string"
+	}
+}
