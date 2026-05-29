@@ -4,27 +4,54 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"vannucci.com/envtoschema/m/internal/infer"
+	"vannucci.com/envtoschema/m/internal/read"
+	"vannucci.com/envtoschema/m/internal/validate"
 )
 
 func main() {
 
-	target_flag := flag.String("target", "", "target file to parse into a schema")
+	var target string
+	var output string
+	var mode string
+
+	flag.StringVar(&target, "target", "", "target file to parse into a schema")
+	flag.StringVar(&output, "output", "", "output schema name (optional)")
+	flag.StringVar(&mode, "mode", "", "1 for json to schema, 2 for validate schema against json")
 
 	flag.Parse()
-
-	target := *target_flag
 
 	if target == "" {
 		fmt.Println("No target specified, ending")
 		os.Exit(1)
 	}
 
-	file_bytes := ReadFile(target, 100)
+	if output == "" {
+		output = "schema.json" // default
+	}
+
+	file_bytes, err := read.ReadFile(target, 1)
+
+	if err != nil {
+		fmt.Printf("Error formatting file: %v", err)
+		os.Exit(1)
+	}
+
+	if err = validate.IsJSON(file_bytes); err != nil {
+		fmt.Printf("Error file is not valid JSON: %v", err)
+		os.Exit(1)
+	}
+
+	parsed_file, err := infer.ParseFlat(file_bytes)
+
+	if err != nil {
+		fmt.Printf("Error parsing file: %v", err)
+	}
+
+	fmt.Printf("Parsed file: %v\n", parsed_file)
 
 	// Workflow 1
-	// read config file
-	// check size
-	// validate json
 	// parse
 	// infer type
 	// exposure selection form to user
@@ -38,4 +65,7 @@ func main() {
 
 	// Details
 	// Readfile can be either over HTTP from AppConfig SDK, or locally for file
+
+	fmt.Println("Schema generation complete")
+	os.Exit(0)
 }

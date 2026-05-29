@@ -20,20 +20,16 @@ import (
 //   - does not interpret or validate content
 //   - caller owns the returned slice
 var ErrFileTooLarge = errors.New("file exceeds maximum allowed size")
-	
+
 func ReadFile(path string, maxBytes int64) ([]byte, error) {
-	info, err := os.Stat(path)
+	_, err := os.Stat(path)
 
 	if err != nil {
 		return nil, fmt.Errorf("file doesn't exist or isn't accessible: %w", err)
 	}
 
-	if info.Size() > maxBytes {
-		return nil, ErrFileTooLarge
-	}
-
 	f, err := os.Open(path)
-	
+
 	if err != nil {
 		return nil, fmt.Errorf("error reading file: %w", err)
 	}
@@ -46,7 +42,6 @@ func ReadFile(path string, maxBytes int64) ([]byte, error) {
 		return nil, fmt.Errorf("error reading file: %w", err)
 	}
 
-	return data, nil 
-
+	return data, nil
 
 }
