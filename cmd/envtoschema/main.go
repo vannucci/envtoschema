@@ -1,15 +1,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
 
 func main() {
 
-	argsWithoutProg := os.Args[1:]
+	target_flag := flag.String("target", "", "target file to parse into a schema")
 
-	fmt.Println(argsWithoutProg)
+	flag.Parse()
+
+	target := *target_flag
+
+	if target == "" {
+		fmt.Println("No target specified, ending")
+		os.Exit(1)
+	}
+
+	file_bytes := ReadFile(target, 100)
+
 	// Workflow 1
 	// read config file
 	// check size

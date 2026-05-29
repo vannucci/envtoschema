@@ -1,29 +1,34 @@
 package server
 
-type FieldView struct {
-	Key          string
-	InferredType string
-}
+// import (
+// 	"log"
+// 	"net/http"
+// )
 
-type PageData struct {
-	Fields []FieldView
-}
+// type FieldView struct {
+// 	Key          string
+// 	InferredType string
+// }
 
-func Start(elements []InferredElement) {
-	fields := toFieldViews(elements)
-	data := PageData{Fields: fields}
+// type PageData struct {
+// 	Fields []FieldView
+// }
 
-	http.HandleFunc("GET /", indexHandler(data))
-	http.HandleFunc("POST /generate", generateHandler)
+// func Start(elements []InferredElement) {
+// 	fields := toFieldViews(elements)
+// 	data := PageData{Fields: fields}
 
-	log.Println("listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+// 	http.HandleFunc("GET /", indexHandler(data))
+// 	http.HandleFunc("POST /generate", generateHandler)
 
-func toFieldViews(elements []InferredElement) []FieldView {
-	views := make([]FieldView, 0, len(elements))
-	for _, e := range elements {
-		views = append(views, toFieldView(e))
-	}
-	return views
-}
+// 	log.Println("listening on :8080")
+// 	log.Fatal(http.ListenAndServe(":8080", nil))
+// }
+
+// func toFieldViews(elements []InferredElement) []FieldView {
+// 	views := make([]FieldView, 0, len(elements))
+// 	for _, e := range elements {
+// 		views = append(views, toFieldView(e))
+// 	}
+// 	return views
+// }
