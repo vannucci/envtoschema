@@ -73,13 +73,13 @@ func ParseFlat(data []byte) ([]Entry, error) {
 
 // Postconditions:
 // 		- returns exactly one TypeCandidate
-//		- never returns an error; ambiguity is encoded in the candidate itself
+//		- never returns an error
 
 // Ambiguity rules:
-// 		- "true" / "false" (case-insensitive) -> { Primary: TypeBool, Options: [TypeBool, TypeString]}
-// 		- valid integer string -> { Primary: TypeInt, Options: [TypeInt, TypeFloat, TypeString]}
-//		- valid float string -> { Primary: TypeFloat, Options: [TypeFloat, TypeInt, TypeString]}
-// 		- anything else -> { Primary: TypeString, Options: [TypeString]}
+// 		- "true" / "false" (case-insensitive) -> { Primary: TypeBool, }
+// 		- valid integer string -> { Primary: TypeInt, }
+//		- valid float string -> { Primary: TypeFloat, }
+// 		- anything else -> { Primary: TypeString, }
 
 // Invariants:
 // 		- same input always produces same output (pure, no side effects)
@@ -96,7 +96,6 @@ const (
 
 type TypeCandidate struct {
 	Primary Type
-	Options []Type
 }
 
 func InferType(value string) TypeCandidate {
@@ -104,27 +103,23 @@ func InferType(value string) TypeCandidate {
 	if lower == "true" || lower == "false" {
 		return TypeCandidate{
 			Primary: TypeBool,
-			Options: []Type{TypeBool, TypeString},
 		}
 	}
 
 	if _, err := strconv.Atoi(value); err == nil {
 		return TypeCandidate{
 			Primary: TypeInt,
-			Options: []Type{TypeInt, TypeFloat, TypeString},
 		}
 	}
 
 	if _, err := strconv.ParseFloat(value, 64); err == nil {
 		return TypeCandidate{
 			Primary: TypeFloat,
-			Options: []Type{TypeFloat, TypeInt, TypeString},
 		}
 	}
 
 	return TypeCandidate{
 		Primary: TypeString,
-		Options: []Type{TypeString},
 	}
 }
 

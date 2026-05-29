@@ -1,34 +1,31 @@
 package server
 
-// import (
-// 	"log"
-// 	"net/http"
-// )
+import (
+	"html/template"
+	"log"
+	"net/http"
+	"os/exec"
+	"time"
+)
 
-// type FieldView struct {
-// 	Key          string
-// 	InferredType string
-// }
+type FieldView struct {
+	Key          string
+	InferredType string
+}
 
-// type PageData struct {
-// 	Fields []FieldView
-// }
+type PageData struct {
+	Fields []FieldView
+}
 
-// func Start(elements []InferredElement) {
-// 	fields := toFieldViews(elements)
-// 	data := PageData{Fields: fields}
+var tmpl = template.Must(template.ParseFiles("internal/server/templates/index.html"))
 
-// 	http.HandleFunc("GET /", indexHandler(data))
-// 	http.HandleFunc("POST /generate", generateHandler)
-
-// 	log.Println("listening on :8080")
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
-
-// func toFieldViews(elements []InferredElement) []FieldView {
-// 	views := make([]FieldView, 0, len(elements))
-// 	for _, e := range elements {
-// 		views = append(views, toFieldView(e))
-// 	}
-// 	return views
-// }
+func Start(data PageData, outputPath string) {
+	http.HandleFunc("GET /", indexHandler(data))
+	http.HandleFunc("POST /generate", generateHandler(outputPath))
+	log.Println("listening on :8080")
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		exec.Command("open", "http://localhost:8080").Start() // macOS
+	}()
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}

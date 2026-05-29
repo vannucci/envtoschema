@@ -7,17 +7,18 @@ import (
 
 	"vannucci.com/envtoschema/m/internal/infer"
 	"vannucci.com/envtoschema/m/internal/read"
+	"vannucci.com/envtoschema/m/internal/server"
 	"vannucci.com/envtoschema/m/internal/validate"
 )
 
 func main() {
 
 	var target string
-	var output string
+	var outputPath string
 	var mode string
 
 	flag.StringVar(&target, "target", "", "target file to parse into a schema")
-	flag.StringVar(&output, "output", "", "output schema name (optional)")
+	flag.StringVar(&outputPath, "outputPath", "", "outputPath schema name (optional)")
 	flag.StringVar(&mode, "mode", "", "1 for json to schema, 2 for validate schema against json")
 
 	flag.Parse()
@@ -27,11 +28,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if output == "" {
-		output = "schema.json" // default
+	if outputPath == "" {
+		outputPath = "schema.json" // default
 	}
 
-	file_bytes, err := read.ReadFile(target, 1)
+	file_bytes, err := read.ReadFile(target, 10<<20)
 
 	if err != nil {
 		fmt.Printf("Error formatting file: %v", err)
@@ -47,13 +48,17 @@ func main() {
 
 	if err != nil {
 		fmt.Printf("Error parsing file: %v", err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Parsed file: %v\n", parsed_file)
+	inferred_types := infer.Infer(parsed_file)
+
+	fmt.Printf("Inferred types: %v\n", inferred_types)
+
+	fields := server.ToFieldViews(inferred_types)
+	server.Start(server.PageData{Fields: fields}, outputPath)
 
 	// Workflow 1
-	// parse
-	// infer type
 	// exposure selection form to user
 	// POST form and generate schema
 
@@ -61,7 +66,7 @@ func main() {
 	// read schema
 	// read config file
 	// validate config satisfies schema
-	// if valid, output 1 for CI/CD, else output diff
+	// if valid, outputPath 1 for CI/CD, else outputPath diff
 
 	// Details
 	// Readfile can be either over HTTP from AppConfig SDK, or locally for file

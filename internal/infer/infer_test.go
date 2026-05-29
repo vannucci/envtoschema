@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"slices"
 	"testing"
 )
 
@@ -88,54 +87,38 @@ func TestInferType(t *testing.T) {
 	t.Run("TypeBool", func(t *testing.T) {
 		expect := TypeCandidate{
 			Primary: TypeBool,
-			Options: []Type{TypeBool, TypeString},
 		}
 		candidate := InferType("true")
 		if candidate.Primary != expect.Primary {
 			t.Fatalf("expected primary TypeBool, got: %v", candidate)
-		}
-		if !slices.Equal(candidate.Options, expect.Options) {
-			t.Fatalf("expected options TypeBool, got: %v", candidate)
 		}
 	})
 
 	t.Run("TypeString", func(t *testing.T) {
 		expect := TypeCandidate{
 			Primary: TypeString,
-			Options: []Type{TypeString},
 		}
 		candidate := InferType("foo")
 		if candidate.Primary != expect.Primary {
 			t.Fatalf("expected primary TypeString, got: %v", candidate)
 		}
-		if !slices.Equal(candidate.Options, expect.Options) {
-			t.Fatalf("expected options TypeString, got: %v", candidate)
-		}
 	})
 	t.Run("TypeInt", func(t *testing.T) {
 		expect := TypeCandidate{
 			Primary: TypeInt,
-			Options: []Type{TypeInt, TypeFloat, TypeString},
 		}
 		candidate := InferType("100")
 		if candidate.Primary != expect.Primary {
 			t.Fatalf("expected primary TypeInt, got: %v", candidate)
 		}
-		if !slices.Equal(candidate.Options, expect.Options) {
-			t.Fatalf("expected options TypeInt, got: %v", candidate)
-		}
 	})
 	t.Run("TypeFloat", func(t *testing.T) {
 		expect := TypeCandidate{
 			Primary: TypeFloat,
-			Options: []Type{TypeFloat, TypeInt, TypeString},
 		}
 		candidate := InferType("42.555")
 		if candidate.Primary != expect.Primary {
 			t.Fatalf("expected primary TypeFloat, got: %v", candidate)
-		}
-		if !slices.Equal(candidate.Options, expect.Options) {
-			t.Fatalf("expected options TypeFloat, got: %v", candidate)
 		}
 	})
 }
