@@ -15,11 +15,17 @@ func main() {
 
 	var target string
 	var outputPath string
-	var mode string
+	// var mode string
 
 	flag.StringVar(&target, "target", "", "target file to parse into a schema")
 	flag.StringVar(&outputPath, "outputPath", "", "outputPath schema name (optional)")
-	flag.StringVar(&mode, "mode", "", "1 for json to schema, 2 for validate schema against json")
+	// flag.StringVar(&mode, "mode", "", "1 for json to schema, 2 for validate schema against json")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: envtoschema -target <file> [-output <file>] [-mode <1|2>]\n\n")
+		fmt.Fprintf(os.Stderr, "Flags:\n")
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
@@ -32,7 +38,7 @@ func main() {
 		outputPath = "schema.json" // default
 	}
 
-	file_bytes, err := read.ReadFile(target, 10<<20)
+	file_bytes, err := read.ReadFile(target)
 
 	if err != nil {
 		fmt.Printf("Error formatting file: %v", err)

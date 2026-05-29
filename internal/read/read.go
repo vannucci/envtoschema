@@ -21,7 +21,7 @@ import (
 //   - caller owns the returned slice
 var ErrFileTooLarge = errors.New("file exceeds maximum allowed size")
 
-func ReadFile(path string, maxBytes int64) ([]byte, error) {
+func ReadFile(path string) ([]byte, error) {
 	_, err := os.Stat(path)
 
 	if err != nil {

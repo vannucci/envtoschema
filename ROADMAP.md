@@ -33,10 +33,10 @@ The pattern is the same across all of them: **bring your own schema, bring your 
 ## V0 — Core Tool
 
 - [x] CLI reads a flat JSON config file
-- [ ] Type inference for `string`, `integer`, `float`, `boolean`
-- [ ] Localhost form UI to review and override inferred types
-- [ ] Mark fields as required, add descriptions
-- [ ] Generate a valid AppConfig JSON Schema file on disk
+- [x] Type inference for `string`, `integer`, `float`, `boolean`
+- [x] Localhost form UI to review and override inferred types
+- [x] Mark fields as required, add descriptions
+- [x] Generate a valid AppConfig JSON Schema file on disk
 - [ ] Basic validator: does this JSON config pass the schema?
 
 ---
