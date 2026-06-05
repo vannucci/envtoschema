@@ -1,8 +1,0 @@
-{
-  "PORT": "3000",
-  "DEBUG": "true",
-  "DB_HOST": "localhost",
-  "API_KEY": "abc123",
-  "MAX_RETRIES": "5",
-  "TIMEOUT_MS": "250.5"
-}

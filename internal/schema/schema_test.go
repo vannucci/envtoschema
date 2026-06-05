@@ -1,6 +1,10 @@
 package schema
 
-import "testing"
+import (
+	"fmt"
+	"path/filepath"
+	"testing"
+)
 
 func TestSchemaBuilder(t *testing.T) {
 	t.Run("empty schema", func(t *testing.T) {
@@ -22,4 +26,18 @@ func TestSchemaBuilder(t *testing.T) {
 		}
 	})
 
+}
+
+func TestReadFile(t *testing.T) {
+	t.Run("valid config, valid schema", func(t *testing.T) {
+		config := filepath.Join("testdata/schemaValidation", "flat_valid.json")
+		fmt.Println(config)
+		schema := filepath.Join("testdata/schemaValidation", "schema.json")
+
+		err := ValidateConfig(config, schema)
+
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+	})
 }

@@ -1,5 +1,11 @@
 package schema
 
+import (
+	"os"
+
+	"github.com/santhosh-tekuri/jsonschema/v6"
+)
+
 type SchemaNode struct {
 	Type       string
 	Properties map[string]*SchemaNode
@@ -110,5 +116,27 @@ func buildNode(node *SchemaNode) map[string]any {
 	}
 
 	return out
+
+}
+
+func ValidateConfig(config string, schema string) error {
+	compiler := jsonschema.NewCompiler()
+
+	sch, err := compiler.Compile("testdata/schemaValidation/schema.json")
+	if err != nil {
+		return err
+	}
+
+	c, err := os.Open("testdata/schemaValidation/flat_valid.json")
+	if err != nil {
+		return nil
+	}
+	defer c.Close()
+
+	if err = sch.Validate(c); err != nil {
+		return err
+	}
+
+	return nil
 
 }
