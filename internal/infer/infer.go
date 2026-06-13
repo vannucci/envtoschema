@@ -3,25 +3,11 @@ package infer
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 )
-
-// ParseFlat takes in our byte stream and turns it into a slice of KV pairs that
-// we will run through Infer to guess at their type
-
-// Preconditions:
-// 		- input is a byte stream and is valid JSON
-
-// Postconditions:
-// 		- returns a slice of non-empty Entries
-// 		- returns error if an object is found, violating flatness condition
-// 		- returns error if an empty value is found
-
-// Invariants:
-// 		- empty JSON object {} returns empty slice, nil error
-// 		- caller is responsible for deciding if empty result is an error
 
 type Entry struct {
 	Key   string
@@ -32,12 +18,46 @@ var ErrNonFlatJSON = errors.New("JSON is not flat")
 var ErrEmptyValue = errors.New("value is empty")
 var ErrNullValue = errors.New("null value is not allowed")
 var ErrArrayValue = errors.New("array value is not allowed")
+var ErrInvalidJson = errors.New("file is not valid JSON")
+var ErrReadingFile = errors.New("error reading file")
+var ErrFileDoesNotExist = errors.New("file does not exist")
+var ErrUnmarshalFile = errors.New("failed to unmarshal file")
+var ErrUnmarsalLine = errors.New("failed to unmarshal line")
 
-func ParseFlat(data []byte) ([]Entry, error) {
+func IsJSON(data []byte) error {
+	if json.Valid(data) {
+		return nil
+	}
+	return ErrInvalidJson
+
+}
+
+func ParseFlat(path string) ([]Entry, error) {
 	var dataMap map[string]json.RawMessage
 	var returnEntries []Entry
+
+	_, err := os.Stat(path)
+
+	if err != nil {
+		return nil, ErrFileDoesNotExist
+	}
+
+	f, err := os.Open(path)
+
+	if err != nil {
+		return nil, ErrFileDoesNotExist
+	}
+
+	defer f.Close()
+
+	data, err := io.ReadAll(f)
+
+	if err != nil {
+		return nil, ErrReadingFile
+	}
+
 	if err := json.Unmarshal(data, &dataMap); err != nil {
-		return nil, fmt.Errorf("error unmarshaling: %w", err)
+		return nil, ErrUnmarshalFile
 	}
 
 	for k, v := range dataMap {
@@ -52,7 +72,7 @@ func ParseFlat(data []byte) ([]Entry, error) {
 		}
 		var s string
 		if err := json.Unmarshal(v, &s); err != nil {
-			return nil, fmt.Errorf("error unmarshaling: %w", err)
+			return nil, ErrUnmarsalLine
 		}
 		if s == "" {
 			return nil, ErrEmptyValue
