@@ -39,7 +39,7 @@ func main() {
 	parsed_file, err := infer.ParseFlat(targetPath)
 
 	if err != nil {
-		fmt.Printf("Error on parsing", err)
+		fmt.Printf("Error on parsing: %v", err)
 	}
 
 	inferred_types := infer.Infer(parsed_file)
