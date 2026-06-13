@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"os"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
@@ -122,18 +123,23 @@ func buildNode(node *SchemaNode) map[string]any {
 func ValidateConfig(config string, schema string) error {
 	compiler := jsonschema.NewCompiler()
 
-	sch, err := compiler.Compile("testdata/schemaValidation/schema.json")
+	sch, err := compiler.Compile(schema)
 	if err != nil {
 		return err
 	}
 
-	c, err := os.Open("testdata/schemaValidation/flat_valid.json")
+	c, err := os.Open(config)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer c.Close()
 
-	if err = sch.Validate(c); err != nil {
+	var instance any
+	if err := json.NewDecoder(c).Decode(&instance); err != nil {
+		return err
+	}
+
+	if err = sch.Validate(instance); err != nil {
 		return err
 	}
 
